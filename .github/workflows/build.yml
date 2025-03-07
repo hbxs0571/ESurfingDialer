@@ -35,29 +35,34 @@ jobs:
           export CFLAGS="-I/usr/include -I/usr/include/x86_64-linux-gnu"
           export LDFLAGS="-L/usr/lib -L/usr/lib/x86_64-linux-gnu"
           export PKG_CONFIG_PATH="/usr/lib/x86_64-linux-gnu/pkgconfig:/usr/share/pkgconfig"
+          echo "环境变量已设置: CFLAGS=${CFLAGS}, LDFLAGS=${LDFLAGS}, PKG_CONFIG_PATH=${PKG_CONFIG_PATH}"
 
           # 获取当前 Python 版本
-          PYTHON_VERSION=$(python3 -c "import sys; print(f'{sys.version_info.major}.{sys.version_info.minor}')"
+          PYTHON_VERSION=$(python3 -c "import sys; print(f'{sys.version_info.major}.{sys.version_info.minor}')")
           echo "当前 Python 版本: ${PYTHON_VERSION}"
 
           # 下载 Python 源码
           echo "正在下载 Python 源码..."
           wget -q https://www.python.org/ftp/python/${PYTHON_VERSION}.0/Python-${PYTHON_VERSION}.0.tgz
+          echo "下载完成: Python-${PYTHON_VERSION}.0.tgz"
 
           # 解压源码
           echo "正在解压 Python 源码..."
           tar -xzf Python-${PYTHON_VERSION}.0.tgz
-          cd Python-${PYTHON_VERSION}.0
+          echo "解压完成: Python-${PYTHON_VERSION}.0"
 
           # 配置和构建 Python
           echo "正在配置和构建 Python..."
           ./configure > /dev/null  # 静默配置
+          echo "配置完成"
           make > /dev/null  # 静默构建
+          echo "构建完成"
 
           # 检查 setup.py 是否存在
           if [ -f "setup.py" ]; then
             echo "setup.py 已找到，正在安装 distutils..."
             sudo python3 setup.py install --prefix=/usr > /dev/null  # 静默安装
+            echo "distutils 安装完成"
           else
             echo "错误: setup.py 未找到！"
             echo "请检查 config.log 中的错误信息:"
@@ -69,6 +74,7 @@ jobs:
           echo "清理临时文件..."
           cd ..
           rm -rf Python-${PYTHON_VERSION}.0 Python-${PYTHON_VERSION}.0.tgz
+          echo "临时文件已清理"
 
       - name: Set up OpenWrt SDK
         run: |
