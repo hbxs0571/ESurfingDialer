@@ -27,14 +27,25 @@ jobs:
 
       - name: Manually install python3-distutils
         run: |
-          # 下载 Python 源码
+          # 获取当前 Python 版本
           PYTHON_VERSION=$(python3 -c "import sys; print(f'{sys.version_info.major}.{sys.version_info.minor}')")
+
+          # 下载 Python 源码
           wget https://www.python.org/ftp/python/${PYTHON_VERSION}.0/Python-${PYTHON_VERSION}.0.tgz
+
+          # 解压源码
           tar -xzf Python-${PYTHON_VERSION}.0.tgz
           cd Python-${PYTHON_VERSION}.0
 
-          # 安装 distutils 模块
-          sudo python3 setup.py install --prefix=/usr
+          # 检查 setup.py 是否存在
+          if [ -f "setup.py" ]; then
+            echo "setup.py found, installing distutils..."
+            sudo python3 setup.py install --prefix=/usr
+          else
+            echo "setup.py not found! Directory contents:"
+            ls -l
+            exit 1
+          fi
 
           # 清理临时文件
           cd ..
