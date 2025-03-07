@@ -11,6 +11,8 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write  # 确保有足够的权限上传 Artifact
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
@@ -32,8 +34,12 @@ jobs:
           cp -r ../ESurfingDialer package/
           make package/ESurfingDialer/compile V=s
 
+      - name: Debug - List files
+        run: |
+          ls -R sdk/bin/packages
+
       - name: Upload IPK file
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:
           name: esurfingdialer.ipk
           path: sdk/bin/packages/ramips/mt7621/esurfingdialer_*.ipk
