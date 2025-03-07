@@ -37,6 +37,10 @@ jobs:
           tar -xzf Python-${PYTHON_VERSION}.0.tgz
           cd Python-${PYTHON_VERSION}.0
 
+          # 生成 setup.py
+          ./configure
+          make
+
           # 检查 setup.py 是否存在
           if [ -f "setup.py" ]; then
             echo "setup.py found, installing distutils..."
