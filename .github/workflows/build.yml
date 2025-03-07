@@ -38,8 +38,13 @@ jobs:
         run: |
           ls -R sdk/bin/packages
 
+      - name: Debug - Check actions download
+        run: |
+          echo "Checking actions download info..."
+          ls -l $GITHUB_WORKSPACE/_actions
+
       - name: Upload IPK file
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: esurfingdialer.ipk
           path: sdk/bin/packages/ramips/mt7621/esurfingdialer_*.ipk
