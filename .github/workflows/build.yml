@@ -23,13 +23,22 @@ jobs:
       - name: Install dependencies
         run: |
           sudo apt update
-          sudo apt install -y build-essential libncurses5-dev gawk git subversion libssl-dev gettext zlib1g-dev swig unzip python3 python3-setuptools python3-venv python3-distutils
-          sudo apt install -y python3-dev
-          sudo python3 -m ensurepip --upgrade
+          sudo apt install -y build-essential libncurses5-dev gawk git subversion libssl-dev gettext zlib1g-dev swig unzip python3 python3-setuptools python3-venv
 
-      - name: Check Python version
+      - name: Manually install python3-distutils
         run: |
-          python3 --version
+          # 下载 Python 源码
+          PYTHON_VERSION=$(python3 -c "import sys; print(f'{sys.version_info.major}.{sys.version_info.minor}')")
+          wget https://www.python.org/ftp/python/${PYTHON_VERSION}.0/Python-${PYTHON_VERSION}.0.tgz
+          tar -xzf Python-${PYTHON_VERSION}.0.tgz
+          cd Python-${PYTHON_VERSION}.0
+
+          # 安装 distutils 模块
+          sudo python3 setup.py install --prefix=/usr
+
+          # 清理临时文件
+          cd ..
+          rm -rf Python-${PYTHON_VERSION}.0 Python-${PYTHON_VERSION}.0.tgz
 
       - name: Set up OpenWrt SDK
         run: |
