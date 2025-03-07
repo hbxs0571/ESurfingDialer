@@ -46,13 +46,29 @@ jobs:
           wget -q https://www.python.org/ftp/python/${PYTHON_VERSION}.0/Python-${PYTHON_VERSION}.0.tgz
           echo "下载完成: Python-${PYTHON_VERSION}.0.tgz"
 
+          # 检查源码包完整性
+          echo "正在检查源码包完整性..."
+          if ! tar -tf Python-${PYTHON_VERSION}.0.tgz > /dev/null; then
+            echo "错误: 源码包损坏或不完整！"
+            exit 1
+          fi
+
           # 解压源码
           echo "正在解压 Python 源码..."
           tar -xzf Python-${PYTHON_VERSION}.0.tgz
           echo "解压完成: Python-${PYTHON_VERSION}.0"
 
+          # 检查 configure 文件是否存在
+          if [ ! -f "Python-${PYTHON_VERSION}.0/configure" ]; then
+            echo "错误: configure 文件未找到！"
+            echo "目录内容:"
+            ls -l Python-${PYTHON_VERSION}.0
+            exit 1
+          fi
+
           # 配置和构建 Python
           echo "正在配置和构建 Python..."
+          cd Python-${PYTHON_VERSION}.0
           ./configure > /dev/null  # 静默配置
           echo "配置完成"
           make > /dev/null  # 静默构建
