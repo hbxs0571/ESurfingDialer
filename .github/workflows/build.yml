@@ -27,7 +27,6 @@ jobs:
 
       - name: Install Python build dependencies
         run: |
-          sudo apt update
           sudo apt install -y libbz2-dev libdb-dev libgdbm-dev liblzma-dev tk-dev uuid-dev libreadline-dev libsqlite3-dev libffi-dev libc6-dev libncursesw5-dev libpanel-dev libb2-dev
 
       - name: Manually install python3-distutils
@@ -92,12 +91,8 @@ jobs:
           echo "构建完成，输出 IPK 文件路径:"
           find sdk/bin/packages -name "esurfingdialer_*.ipk"  # 仅输出 IPK 文件路径
 
-      - name: Debug - List files
-        run: |
-          ls -R sdk/bin/packages
-
       - name: Upload IPK file
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v4
         with:
           name: esurfingdialer.ipk
           path: sdk/bin/packages/ramips/mt7621/esurfingdialer_*.ipk
