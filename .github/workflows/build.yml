@@ -32,7 +32,7 @@ jobs:
       - name: Manually install python3-distutils
         run: |
           # 获取当前 Python 版本
-          PYTHON_VERSION=$(python3 -c "import sys; print(f'{sys.version_info.major}.{sys.version_info.minor}')"
+          PYTHON_VERSION=$(python3 -c "import sys; print(f'{sys.version_info.major}.{sys.version_info.minor}')")
           echo "当前 Python 版本: ${PYTHON_VERSION}"
 
           # 下载 Python 源码
