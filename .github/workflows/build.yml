@@ -41,7 +41,7 @@ jobs:
           tar -xzf Python-${PYTHON_VERSION}.0.tgz
           cd Python-${PYTHON_VERSION}.0
 
-          # 生成 setup.py
+          # 配置和构建 Python
           ./configure
           make
 
@@ -52,6 +52,8 @@ jobs:
           else
             echo "setup.py not found! Directory contents:"
             ls -l
+            echo "Config.log contents:"
+            cat config.log
             exit 1
           fi
 
