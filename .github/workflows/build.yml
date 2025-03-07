@@ -27,7 +27,11 @@ jobs:
 
       - name: Install Python build dependencies
         run: |
-          sudo apt install -y libbz2-dev libdb-dev libgdbm-dev liblzma-dev tk-dev uuid-dev libreadline-dev libsqlite3-dev libffi-dev libc6-dev libncursesw5-dev libpanelw5-dev libb2-dev
+          sudo apt update
+          sudo apt install -y software-properties-common
+          sudo add-apt-repository universe
+          sudo apt update
+          sudo apt install -y libbz2-dev libdb-dev libgdbm-dev liblzma-dev tk-dev uuid-dev libreadline-dev libsqlite3-dev libffi-dev libc6-dev libncursesw5-dev libpanel-dev libb2-dev
 
       - name: Manually install python3-distutils
         run: |
@@ -37,7 +41,7 @@ jobs:
           export PKG_CONFIG_PATH="/usr/lib/x86_64-linux-gnu/pkgconfig:/usr/share/pkgconfig"
 
           # 获取当前 Python 版本
-          PYTHON_VERSION=$(python3 -c "import sys; print(f'{sys.version_info.major}.{sys.version_info.minor}')"
+          PYTHON_VERSION=$(python3 -c "import sys; print(f'{sys.version_info.major}.{sys.version_info.minor}')")
           echo "当前 Python 版本: ${PYTHON_VERSION}"
 
           # 下载 Python 源码
