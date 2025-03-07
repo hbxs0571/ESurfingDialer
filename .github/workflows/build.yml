@@ -16,30 +16,88 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
+        with:
+          persist-credentials: false
+          fetch-depth: 0
 
       - name: Install dependencies
         run: |
           sudo apt update
-          sudo apt install -y build-essential libncurses5-dev gawk git subversion libssl-dev gettext zlib1g-dev swig unzip python3 python3-setuptools
+          sudo apt install -y build-essential libncurses5-dev gawk git subversion libssl-dev gettext zlib1g-dev swig unzip python3 python3-setuptools python3-venv
+
+      - name: Install Python build dependencies
+        run: |
+          sudo apt update
+          sudo apt install -y libbz2-dev libdb-dev libgdbm-dev liblzma-dev tk-dev uuid-dev libreadline-dev libsqlite3-dev libffi-dev libc6-dev libncursesw5-dev libpanel-dev libb2-dev
+
+      - name: Manually install python3-distutils
+        run: |
+          # 设置环境变量
+          export CFLAGS="-I/usr/include -I/usr/include/x86_64-linux-gnu"
+          export LDFLAGS="-L/usr/lib -L/usr/lib/x86_64-linux-gnu"
+          export PKG_CONFIG_PATH="/usr/lib/x86_64-linux-gnu/pkgconfig:/usr/share/pkgconfig"
+
+          # 获取当前 Python 版本
+          PYTHON_VERSION=$(python3 -c "import sys; print(f'{sys.version_info.major}.{sys.version_info.minor}')"
+          echo "当前 Python 版本: ${PYTHON_VERSION}"
+
+          # 下载 Python 源码
+          echo "正在下载 Python 源码..."
+          wget -q https://www.python.org/ftp/python/${PYTHON_VERSION}.0/Python-${PYTHON_VERSION}.0.tgz
+
+          # 解压源码
+          echo "正在解压 Python 源码..."
+          tar -xzf Python-${PYTHON_VERSION}.0.tgz
+          cd Python-${PYTHON_VERSION}.0
+
+          # 配置和构建 Python
+          echo "正在配置和构建 Python..."
+          ./configure > /dev/null  # 静默配置
+          make > /dev/null  # 静默构建
+
+          # 检查 setup.py 是否存在
+          if [ -f "setup.py" ]; then
+            echo "setup.py 已找到，正在安装 distutils..."
+            sudo python3 setup.py install --prefix=/usr > /dev/null  # 静默安装
+          else
+            echo "错误: setup.py 未找到！"
+            echo "请检查 config.log 中的错误信息:"
+            cat config.log | grep -i error  # 仅输出错误信息
+            exit 1
+          fi
+
+          # 清理临时文件
+          echo "清理临时文件..."
+          cd ..
+          rm -rf Python-${PYTHON_VERSION}.0 Python-${PYTHON_VERSION}.0.tgz
 
       - name: Set up OpenWrt SDK
         run: |
+          echo "正在设置 OpenWrt SDK..."
           cd sdk
-          ./scripts/feeds update -a
-          ./scripts/feeds install -a
+          chmod +x ./scripts/config.guess  # 添加执行权限
+          chmod +x ./scripts/feeds  # 确保 feeds 脚本也有执行权限
+          ./scripts/feeds update -a > /dev/null  # 静默更新
+          ./scripts/feeds install -a > /dev/null  # 静默安装
 
       - name: Build ESurfingDialer
         run: |
+          echo "正在构建 ESurfingDialer..."
           cd sdk
           cp -r ../ESurfingDialer package/
-          make package/ESurfingDialer/compile V=s
+          make package/ESurfingDialer/compile V=s FORCE=1 > make.log 2>&1 || (cat make.log && exit 1)
+
+      - name: Debug - List files
+        run: |
+          echo "构建完成，输出 IPK 文件路径:"
+          find sdk/bin/packages -name "esurfingdialer_*.ipk"  # 仅输出 IPK 文件路径
 
       - name: Debug - List files
         run: |
           ls -R sdk/bin/packages
 
       - name: Upload IPK file
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v2
         with:
           name: esurfingdialer.ipk
           path: sdk/bin/packages/ramips/mt7621/esurfingdialer_*.ipk
