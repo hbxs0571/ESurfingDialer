@@ -25,6 +25,10 @@ jobs:
           sudo apt update
           sudo apt install -y build-essential libncurses5-dev gawk git subversion libssl-dev gettext zlib1g-dev swig unzip python3 python3-setuptools python3-venv
 
+      - name: Install Python build dependencies
+        run: |
+          sudo apt install -y libbz2-dev libdb-dev libgdbm-dev liblzma-dev tk-dev uuid-dev libreadline-dev
+
       - name: Manually install python3-distutils
         run: |
           # 获取当前 Python 版本
